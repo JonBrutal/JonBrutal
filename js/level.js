@@ -29,19 +29,22 @@
     // Ослабление шума при прохождении препятствия
     occlusion: { wall: -3, bush: -1, sampleStep: 0.7, cap: -12 },
 
+    // Яркость палитры прямо пропорциональна шуму поверхности: тихое — тёмное
+    // и холодное, громкое — светлое и тёплое. Игрок читает опасность глазами,
+    // а не памятью на названия.
     colors: {
-      moss:      ['#1b2c22', '#22362a'],
-      grass:     ['#1f2c1c', '#273524'],
-      tallgrass: ['#18281a', '#1f3221'],
-      leaves:    ['#33281a', '#3d3020'],
-      gravel:    ['#2a2b2e', '#333438'],
-      wood:      ['#382c1e', '#443626'],
-      metal:     ['#232d36', '#2c3742'],
-      water:     ['#132230', '#182b3c'],
-      wall:      ['#0d1216', '#18222a'],
+      moss:      ['#132b24', '#18352c'],   // шум 1
+      grass:     ['#26331f', '#2e3d26'],   // шум 2
+      tallgrass: ['#2c3b22', '#35462a'],   // шум 3
+      wood:      ['#4b3925', '#57432d'],   // шум 4–7
+      leaves:    ['#5a4020', '#674a27'],   // шум 6
+      gravel:    ['#4a4c52', '#55575e'],   // шум 6
+      water:     ['#1c3d5a', '#234a6c'],   // шум 7
+      metal:     ['#5b6a78', '#697a89'],   // шум 8
+      wall:      ['#0a0e12', '#111820'],
       wallEdge:  '#2c3d47',
-      pit:       '#04070a',
-      bush:      '#2a4230',
+      pit:       '#03060a',
+      bush:      '#3f5f45',
       exit:      '#7fe6b0'
     }
   };
@@ -410,9 +413,12 @@
     flagRect(spec.exit, F_SOLID, false);
     flagRect(spec.exit, F_PIT, false);
 
-    // точка входа всегда проходима
-    flagRect([Math.floor(spec.spawn.x) - 1, Math.floor(spec.spawn.y) - 1, 3, 3], F_SOLID, false);
-    flagRect([Math.floor(spec.spawn.x) - 1, Math.floor(spec.spawn.y) - 1, 3, 3], F_PIT, false);
+    // Точка входа: всегда проходима и всегда тихая — игрок не должен начинать
+    // уровень стоя на сухих листьях, ещё не поняв, где он.
+    const sx = Math.floor(spec.spawn.x), sy = Math.floor(spec.spawn.y);
+    flagRect([sx - 2, sy - 2, 5, 5], F_SOLID, false);
+    flagRect([sx - 2, sy - 2, 5, 5], F_PIT, false);
+    paintRect([sx - 2, sy - 2, 5, 5], 'moss');
 
     M.spec = spec;
     M.name = spec.name;
@@ -472,7 +478,12 @@
     return M.noise[idx(tx, ty)];
   }
 
-  // Суммарное ослабление шума по лучу: стена −3, куст −1
+  /**
+   * Суммарное ослабление шума по лучу: стена −3, куст −1.
+   * Считаем ЗА ПРЕПЯТСТВИЕ, а не за тайл: стена в два тайта толщиной и куст
+   * шириной в пять тайлов — это одна стена и один куст. Иначе широкий куст
+   * глушил бы звук как пять стен и монстр переставал слышать что угодно.
+   */
   function occlusion(ax, ay, bx, by) {
     if (!M.flags) { return 0; }
     const O = P.occ;
@@ -480,7 +491,7 @@
     const dist = Math.hypot(dx, dy);
     if (dist < 0.001) { return 0; }
     const steps = Math.ceil(dist / O.sampleStep);
-    let sum = 0, lastIdx = -1;
+    let sum = 0, lastIdx = -1, prevKind = 0;   // 0 — пусто, 1 — стена, 2 — куст
     for (let i = 1; i <= steps; i++) {
       const t = i / steps;
       const tx = Math.floor(ax + dx * t), ty = Math.floor(ay + dy * t);
@@ -489,9 +500,12 @@
       if (id === lastIdx) { continue; }   // один и тот же тайл не считаем дважды
       lastIdx = id;
       const f = M.flags[id];
-      if (f & F_SOLID) { sum += O.wall; }
-      else if (f & F_BUSH) { sum += O.bush; }
-      if (sum <= O.cap) { return O.cap; }
+      const kind = (f & F_SOLID) ? 1 : ((f & F_BUSH) ? 2 : 0);
+      if (kind !== 0 && kind !== prevKind) {   // вошли в новое препятствие
+        sum += (kind === 1) ? O.wall : O.bush;
+        if (sum <= O.cap) { return O.cap; }
+      }
+      prevKind = kind;
     }
     return sum;
   }
