@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Silent Step — стенд HUD + Panic</title>
+<style>
+  html, body { margin: 0; background: #05080a; color: #8fa2b0;
+               font: 13px/1.5 "Trebuchet MS", "Segoe UI", system-ui, sans-serif; }
+  h1 { font-size: 15px; font-weight: 600; margin: 12px 40px 6px; color: #cfe0ec; }
+  p  { margin: 0 40px 10px; }
+  canvas { outline: none; }
+</style>
+</head>
+<body>
+  <h1>Silent Step — изолированный стенд SS.HUD + SS.Panic</h1>
+  <p>Core/Level/Player/Monster/Mic здесь подменяет DEV STUB внутри js/hud.js.
+     WASD — идти · Shift — бег · C — присед · X — ползком · T — бросок камня ·
+     M — отказать в микрофоне · Пробел (удержание) — QTE дыхания.</p>
+  <!-- порядок важен: hud.js поднимает песочницу, panic.js подключается к её шине -->
+  <script src="../js/hud.js"></script>
+  <script src="../js/panic.js"></script>
+</body>
+</html>
