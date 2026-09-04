@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Silent Step</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: #05080a; color: #7b8794; overflow: hidden;
+    font: 13px/1.4 "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+    -webkit-user-select: none; user-select: none;
+  }
+  #ss-wrap { display: flex; align-items: center; justify-content: center; height: 100%; }
+  canvas { display: block; image-rendering: pixelated; }
+</style>
+</head>
+<body>
+<div id="ss-wrap"><canvas id="ss-canvas"></canvas></div>
+
+<!-- Порядок подключения задаёт порядок слоёв отрисовки:
+     карта → персонажи → HUD → паника. -->
+<script src="js/core.js"></script>
+<script src="js/level.js"></script>
+<script src="js/noise.js"></script>
+<script src="js/player.js"></script>
+<script src="js/monster.js"></script>
+<script src="js/hud.js"></script>
+<script src="js/panic.js"></script>
+</body>
+</html>
