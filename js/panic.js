@@ -303,6 +303,10 @@
     S.qte.holding = false;
     S.flash.t = P.ui.flash;
     S.flash.ok = ok;
+    // Явный исход QTE. Без него звук вынужден был бы угадывать его по скачку
+    // паники и озвучивал бы заодно испуг от монстра — то есть выдавал игроку
+    // информацию, которой у глухого героя нет.
+    emit('panic:qte:end', { ok: ok });
     if (ok) {
       S.cooldown = Q.cooldownOk;
       setValue(S.value - Q.relief);
