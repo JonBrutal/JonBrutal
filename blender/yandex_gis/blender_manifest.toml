@@ -1,0 +1,17 @@
+schema_version = "1.0.0"
+
+id = "yandex_gis"
+version = "0.1.0"
+name = "YandexGIS"
+tagline = "Подложки Яндекс Карт с привязкой, рельеф и здания OSM"
+maintainer = "JonBrutal"
+type = "add-on"
+tags = ["3D View", "Import-Export"]
+
+blender_version_min = "4.2.0"
+
+license = ["SPDX:GPL-3.0-or-later"]
+
+[permissions]
+network = "Загрузка тайлов карт, рельефа и данных OpenStreetMap"
+files = "Кэш тайлов и сохранение текстур на диск"
